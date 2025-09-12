@@ -54,6 +54,19 @@ x-init-ollama: &init-ollama
     - "sleep 3; OLLAMA_HOST=ollama:11434 ollama pull qwen2.5:7b-instruct-q4_K_M; OLLAMA_HOST=ollama:11434 ollama pull nomic-embed-text"
 
 services:
+  portainer:
+  image: portainer/portainer-ce
+  container_name: portainer
+  restart: unless-stopped
+  networks:
+    - localai_default # Ensure it is in the correct network
+  ports:
+    - “9443:9443” # Web UI (HTTPS)
+    - “8000:8000” # Edge agent
+  volumes:
+    - /var/run/docker.sock:/var/run/docker.sock # Allows Portainer to manage Docker
+    - portainer_data:/data # Persistent storage
+    
   flowise:
     image: flowiseai/flowise
     restart: unless-stopped
