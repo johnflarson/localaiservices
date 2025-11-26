@@ -70,10 +70,10 @@ def start_local_ai(profile=None, environment=None):
     if profile and profile != "none":
         cmd.extend(["--profile", profile])
     cmd.extend(["-f", "docker-compose.yml"])
-    #if environment and environment == "private":
-    #    cmd.extend(["-f", "docker-compose.override.private.yml"])
-    ##if environment and environment == "public":
-    #    cmd.extend(["-f", "docker-compose.override.public.yml"])
+    if environment and environment == "private":
+        cmd.extend(["-f", "docker-compose.override.private.yml"])
+    if environment and environment == "public":
+        cmd.extend(["-f", "docker-compose.override.public.yml"])
     cmd.extend(["up", "-d"])
     run_command(cmd)
 
@@ -218,19 +218,19 @@ def check_and_fix_docker_compose_for_searxng():
         print(f"Error checking/modifying docker-compose.yml for SearXNG: {e}")
 
 def main():
-    # parser = argparse.ArgumentParser(description='Start the local AI and Supabase services.')
-    # parser.add_argument('--profile', choices=['cpu', 'gpu-nvidia', 'gpu-amd', 'none'], default='cpu',
-    #                  help='Profile to use for Docker Compose (default: cpu)')
-    # parser.add_argument('--environment', choices=['private', 'public'], default='private',
-    #                  help='Environment to use for Docker Compose (default: private)')
-    # args = parser.parse_args()
+    parser = argparse.ArgumentParser(description='Start the local AI and Supabase services.')
+    parser.add_argument('--profile', choices=['cpu', 'gpu-nvidia', 'gpu-amd', 'none'], default='cpu',
+                      help='Profile to use for Docker Compose (default: cpu)')
+    parser.add_argument('--environment', choices=['private', 'public'], default='private',
+                      help='Environment to use for Docker Compose (default: private)')
+    args = parser.parse_args()
 
     clone_supabase_repo()
     prepare_supabase_env()
 
     # Generate SearXNG secret key and check docker-compose.yml
-    # generate_searxng_secret_key()
-    # check_and_fix_docker_compose_for_searxng()
+    generate_searxng_secret_key()
+    check_and_fix_docker_compose_for_searxng()
 
     stop_existing_containers(args.profile)
 
@@ -242,7 +242,7 @@ def main():
     time.sleep(10)
 
     # Then start the local AI services
-    start_local_ai()
+    start_local_ai(args.profile, args.environment)
 
 if __name__ == "__main__":
     main()
